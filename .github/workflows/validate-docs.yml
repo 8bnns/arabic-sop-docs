@@ -1,0 +1,63 @@
+name: التحقق من الوثائق
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-markdown:
+    name: فحص ملفات Markdown
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: استنساخ المستودع
+        uses: actions/checkout@v4
+
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: تثبيت markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: فحص ملفات Markdown
+        run: |
+          markdownlint "**/*.md" \
+            --ignore node_modules \
+            --config .markdownlint.json || true
+
+      - name: التحقق من وجود الملفات الأساسية
+        run: |
+          echo "التحقق من وجود جميع وثائق SOPs..."
+          files=(
+            "README.md"
+            "فهرس_إجراءات_التشغيل_الموحدة.md"
+            "SOP_صيانة_الجهاز.md"
+            "SOP_تحديث_البرامج.md"
+            "SOP_تنظيف_النظام.md"
+            "SOP_إعداد_التقارير_الأسبوعية.md"
+          )
+          for file in "${files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ موجود: $file"
+            else
+              echo "❌ مفقود: $file"
+              exit 1
+            fi
+          done
+          echo "✅ جميع الوثائق موجودة"
+
+      - name: التحقق من حجم الوثائق
+        run: |
+          echo "التحقق من أن الوثائق ليست فارغة..."
+          for file in SOP_*.md; do
+            lines=$(wc -l < "$file")
+            if [ "$lines" -lt 20 ]; then
+              echo "⚠️ تحذير: $file قصيرة جداً ($lines سطر)"
+            else
+              echo "✅ $file — $lines سطر"
+            fi
+          done

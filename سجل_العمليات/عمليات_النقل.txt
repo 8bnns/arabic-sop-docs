@@ -1,0 +1,8 @@
+=== سجل عمليات النقل ===
+التاريخ: Mon Apr 20 15:08:24 UTC 2026
+
+--- 1. النسخ المكررة (متطابقة bytes) ---
+mv: cannot remove 'Claude (2).dmg': Operation not permitted
+  ✗ فشل نقل Claude (2).dmg
+mv: cannot remove 'Claude (3).dmg': Operation not permitted
+  ✗ فشل نقل Claude (3).dmg
